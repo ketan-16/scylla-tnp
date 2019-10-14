@@ -1,0 +1,133 @@
+{% extends "blog/base_dash.html" %}
+{% block content %}
+{% load crispy_forms_tags %}
+
+{% if user.profile.engaggr < 1 %}
+  <div class = "alert alert-warning">
+    Dear {{user.username}}, Please update your profile
+  </div>
+{% endif %}
+
+<h2>Dashboard</h2>
+<div class="content-section">
+    <div class="media">
+      
+      <img class="rounded-circle account-img" src="{{ user.profile.image.url }}">
+      <div class="media-body">
+        <h2>{{ user.profile.firstname }} {{ user.profile.lastname }}</h2>
+        <p class="text-secondary">@{{ user.username }}</p>
+        <p class="text">{{ user.email }}</p>
+        <p class="text">10th Percentile: {{ user.profile.tenth }}%       12th Percentile: {{ user.profile.twelveth }}% </p>
+        <p class="text">Engineering Aggregate: {{ user.profile.engaggr }}%</p>
+        <button type="button" class="btn btn-default float-right"><a href="{% url 'update-profile' %}" class = ''>Update Profile</a></button>
+      </div>
+    </div>
+  </div>
+  <h2>Eligible</h2>
+  <div class="content-section">
+    
+    <div class="media">
+      <div class="media-body">
+        
+          {% for post in posts %}
+            {% if user.profile.engaggr > post.engg %}
+              {% if user.profile.tenth > post.ten %}
+                {% if user.profile.twelveth > post.twelve %}
+                  <div class="card mb-4">
+                            <div class="card-body">
+                              <h3>{{ post.title }}</h3>
+                                Requirements: 10th: {{post.ten}}&nbsp;&nbsp;&nbsp;12th/Diploma: {{post.twelve}}&nbsp;&nbsp;&nbsp;Engg: {{post.engg}}
+                              <p class="card-text">{{ name }}</p>
+                            </div>
+                            <div class="card-footer text-muted">
+                              Posted on {{ post.date_posted|date:"F d, Y" }} by 
+                              <a href="#">@{{ post.author }}</a>
+                            </div>
+                          </div>
+                  {% endif %}
+                {% endif %}   
+              {% endif %}   
+          {% endfor %}
+      </div>
+    </div>
+  </div>
+  <legend>Ineligible</legend>
+  <div class="content-section">
+      <div class="media">
+        <div class="media-body">
+            
+            {% for post in posts %}
+              {% if user.profile.engaggr < post.engg %}
+                <div class="card mb-4">
+                          <div class="card-body">
+                            <h2 class="card-title">{{ post.title }}</h2>
+                              Requirements: 10th: {{post.ten}}&nbsp;&nbsp;&nbsp;12th/Diploma: {{post.twelve}}&nbsp;&nbsp;&nbsp;Engg: {{post.engg}}
+                            <p class="card-text">{{ name }}</p>
+                          </div>
+                          <div class="card-footer text-muted">
+                            Posted on {{ post.date_posted|date:"F d, Y" }} by 
+                            <a href="#">@{{ post.author }}</a>
+                          </div>
+                        </div> 
+                {% endif %}   
+            {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!--Form-->
+    
+    <legend> Grievances </legend>
+    <div id="accordion">
+      <div class="card">
+        <div class="card-header" id="headingOne">
+          <h5 class="mb-0">
+            <button class="btn btn-link" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+              My Grievances
+            </button>
+          </h5>
+        </div>
+
+        <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
+          <div class="card-body">
+            {% for grievance in grievances %}
+              {% if grievance.g_username == user.username %}
+                {% if grievance.is_answered == True %}
+                  <p><span class="badge badge-success">ANSWERED</span>Company Name:<b>{{grievance.company_name}}</b><br>{{grievance.user_query}}</p>
+                {% else %}
+                  <p><span class="badge badge-warning">UNANSWERED</span>Company Name:<b>{{grievance.company_name}}</b><br>{{grievance.user_query}}</p>
+                {% endif %}
+              {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header" id="headingTwo">
+          <h5 class="mb-0">
+            <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+              New Grievance
+            </button>
+          </h5>
+        </div>
+        <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
+          <div class="card-body">
+            <form method="POST">
+              {% csrf_token %}
+              <fieldset class="form-group">
+                <legend class="border-bottom mb-4">Got a question?</legend>
+                {{ g_form|crispy }}
+              </fieldset>
+              <fieldset class="form-group">
+                <button class="btn btn-outline-info" type="submit">Submit</button>
+              </fieldset>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% for grievance in grievances %}
+      {{grievance.author}}
+    {% endfor %}
+
+{% endblock %}

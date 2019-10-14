@@ -1,0 +1,16 @@
+{% extends "blog/base_admin.html" %}
+{% block content %}
+<legend> Statistics </legend>
+<div class="content-section">
+  <legend> Engineering Aggregate [Students] </legend>
+  {% autoescape off %}
+  {{ plot_div1 }}
+  {% endautoescape %}
+  <p><small> *Based on the Engineering Aggregates of {{ tot_engg }} students </small></p>
+  <legend> Engineering Aggregate [Companies] </legend>
+  {% autoescape off %}
+  {{ plot_div2 }}
+  {% endautoescape %}
+  <p><small> *Based on the Engineering Aggregates of {{ tot_comp }} Companies </small></p>
+</div>
+{% endblock %}
